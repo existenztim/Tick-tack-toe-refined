@@ -1,30 +1,40 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+//import HelloWorld from './components/HelloWorld.vue'
+import { ref } from 'vue';
+
+const players = ref([
+  {
+    id: 'X',
+    name: '',
+    score: 0,
+  },
+  {
+    id: 'O',
+    name: '',
+    score: 0,
+  },
+]);
+
+let nameCount = ref(0);
+const newName = ref('');
+
+const addName = (playerToUpdate) => {
+  nameCount.value++;
+  playerToUpdate.name = newName.value;
+  console.log(playerToUpdate);
+  newName.value = '';
+};
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <h1>tick tack toe</h1>
+  <div v-if="nameCount < 2">
+    <input v-model="newName" type="text" :placeholder="`Name for player ${players[nameCount].id}`" />
+    <button @click="addName(players[nameCount])">Add name</button>
   </div>
-  <HelloWorld msg="Vite + Vue" />
+  <div v-else>
+    <p>Alla har fått sina namn {{ players[0].name }} och {{ players[1].name }}</p>
+  </div>
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+<style scoped></style>
