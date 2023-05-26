@@ -10,3 +10,9 @@ export const players = [
     score: 0,
   },
 ];
+
+export const initBoard = [
+  ['', '', ''],
+  ['', '', ''],
+  ['', '', '']
+]

@@ -4,37 +4,41 @@ import AddName from './components/AddName.vue';
 import ScoreTracker from './components/ScoreTracker.vue';
 import * as data from './models/data';
 import ResetContainer from './components/ResetContainer.vue';
+import { checkPlayers } from './services/handleLocalStorage';
 
+const onGoingGame = ref(checkPlayers);
 const players = ref(data.players);
+localStorage.getItem('players');
 let playerCount = ref(0);
 const incrementplayerCount = () => {
   playerCount.value++;
 };
 
-const board = ref([
-  ['', '', ''],
-  ['', '', ''],
-  ['', '', ''],
-]);
-const checkPlayers = ref(true);
+const board = ref(data.initBoard);
 
 const hardReset = () => {
   localStorage.removeItem('players');
-  checkPlayers.value = false;
+  onGoingGame.value = null;
   playerCount.value = 0;
+  board.value = data.initBoard;
+};
+
+const makeMove = (x:number,y:number) => {
+  console.log("x:", x, "y:", y)
+  board.value[x][y] = players.value[0].id;
 };
 </script>
 
 <template>
   <h1>tick tack toe</h1>
-  <div class="game-container" v-if="playerCount >= 2 || checkPlayers">
+    <div class="game-container" v-if="playerCount >= 2 || onGoingGame">
     <div v-for="player in players">
       <ScoreTracker :player="player" />
     </div>
     <h2>Player {{ players[0].name }}'s turn!</h2>
     <div class="game-board">
       <div v-for="(row, x) in board" :key="x">
-        <div class="cell" v-for="(cell, y) in row" :key="y" :id="`cordinate-${x}-${y}`">{{ players[0].id }}</div>
+        <div @click="makeMove(x,y)" class="cell" v-for="(cell, y) in row" :key="y" :id="`cordinate-${x}-${y}`">{{ cell }}</div>
       </div>
     </div>
     <ResetContainer @newGame="hardReset" />
@@ -54,7 +58,8 @@ const hardReset = () => {
     color: black;
     padding: 2rem;
     background-color: aliceblue;
-
+    width: 50px;
+    height: 50px;
     &:hover {
       background-color: beige;
     }
