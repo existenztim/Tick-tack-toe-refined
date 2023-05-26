@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Iplayer } from '../models/Iplayer';
-import { addUser, checkPlayers } from '../services/handleLocalStorage';
+import { addUser } from '../services/handleLocalStorage';
 const emits = defineEmits(['increment']);
 const { players, playerCount } = defineProps(['players', 'playerCount']);
 const newName = ref('');

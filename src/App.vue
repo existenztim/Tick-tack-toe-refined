@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import AddName from './components/AddName.vue';
 import ScoreTracker from './components/ScoreTracker.vue';
 import * as data from './models/data';
+import ResetContainer from './components/ResetContainer.vue';
 
 const players = ref(data.players);
 let playerCount = ref(0);
@@ -36,7 +37,7 @@ const hardReset = () => {
         <div class="cell" v-for="(cell, y) in row" :key="y" :id="`cordinate-${x}-${y}`">{{ players[0].id }}</div>
       </div>
     </div>
-    <button @click="hardReset">New Game (new players)</button>
+    <ResetContainer @newGame="hardReset" />
   </div>
   <div v-else>
     <AddName :playerCount="playerCount" :players="players" @increment="incrementplayerCount" />

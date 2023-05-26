@@ -1,20 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-
-const checkPlayers = ref(localStorage.getItem('players'));
-console.log('när appen laddas:', checkPlayers.value);
-
-const newPlayersReset = () => {
-  console.log('när funktion callas', checkPlayers.value);
-  localStorage.removeItem('players');
-  console.log('efter localstorage tömts', checkPlayers.value);
-  console.log(checkPlayers.value);
+const emits = defineEmits(['newGame']);
+const newGame = () => {
+  emits('newGame');
 };
 </script>
 
 <template>
   <div class="reset-container">
     <button>New Game (same players)</button>
-    <button @click="newPlayersReset">New Game (new players)</button>
+    <button @click="newGame">New Game (new players)</button>
   </div>
 </template>
