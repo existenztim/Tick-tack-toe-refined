@@ -2,12 +2,12 @@
 import { ref } from 'vue';
 import AddName from './components/AddName.vue';
 import ScoreTracker from './components/ScoreTracker.vue';
-import { checkPlayers } from './services/handleLocalStorage';
 import * as data from './models/data';
+
 const players = ref(data.players);
-let nameCount = ref(0);
-const incrementNameCount = () => {
-  nameCount.value++;
+let playerCount = ref(0);
+const incrementplayerCount = () => {
+  playerCount.value++;
 };
 
 const board = ref([
@@ -15,12 +15,18 @@ const board = ref([
   ['', '', ''],
   ['', '', ''],
 ]);
+const checkPlayers = ref(true);
+
+const hardReset = () => {
+  localStorage.removeItem('players');
+  checkPlayers.value = false;
+  playerCount.value = 0;
+};
 </script>
 
 <template>
   <h1>tick tack toe</h1>
-  <AddName :nameCount="nameCount" :players="players" @increment="incrementNameCount" />
-  <div class="game-container" v-if="nameCount >= 2 || checkPlayers">
+  <div class="game-container" v-if="playerCount >= 2 || checkPlayers">
     <div v-for="player in players">
       <ScoreTracker :player="player" />
     </div>
@@ -30,6 +36,10 @@ const board = ref([
         <div class="cell" v-for="(cell, y) in row" :key="y" :id="`cordinate-${x}-${y}`">{{ players[0].id }}</div>
       </div>
     </div>
+    <button @click="hardReset">New Game (new players)</button>
+  </div>
+  <div v-else>
+    <AddName :playerCount="playerCount" :players="players" @increment="incrementplayerCount" />
   </div>
 </template>
 
@@ -48,5 +58,11 @@ const board = ref([
       background-color: beige;
     }
   }
+}
+.reset-container {
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 </style>
