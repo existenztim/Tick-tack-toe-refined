@@ -1,29 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import * as data from './models/data';
+import { checkPlayers } from './services/handleLocalStorage';
 import AddName from './components/AddName.vue';
 import ScoreTracker from './components/ScoreTracker.vue';
-import * as data from './models/data';
 import ResetContainer from './components/ResetContainer.vue';
-import { checkPlayers } from './services/handleLocalStorage';
 import GameBoard from './components/GameBoard.vue';
 
+localStorage.getItem('players');
 const onGoingGame = ref(checkPlayers);
 const players = ref(data.players);
 const turn = ref(Math.random() < 0.5 ? data.players[0].id : data.players[1].id); //random start order between x/o
-localStorage.getItem('players');
 let playerCount = ref(0);
+let filledCount = ref(0);
 const board = ref(JSON.parse(JSON.stringify(data.initBoard)));
 
 const incrementplayerCount = () => {
   playerCount.value++;
 };
 
+const CalculateWinner = (value:string[][]) => {
+  const winCombos = data.winCombos;
+  console.log(winCombos);
+  return 0; //placeholder
+}
+
 const hardReset = () => {
   localStorage.removeItem('players');
   onGoingGame.value = null;
   playerCount.value = 0;
-  console.log("value",board.value)
-  console.log("start value",data.initBoard)
   board.value = data.initBoard;
 };
 
@@ -31,13 +36,21 @@ const hardReset = () => {
   console.log("soft reset not implemented yet!");
  }
 
+ const winner = computed(() => {
+  return CalculateWinner(board.value.flat());
+});
+
 const makeMove = (x:number,y:number) => {
-  //check if cell already has a value
+  if (winner.value) {
+    return;
+  }
+
   if (board.value[x][y]) {
     return;
   }
   board.value[x][y] = turn.value;
   turn.value = turn.value === data.players[0].id ? data.players[1].id : data.players[0].id;
+  filledCount.value++;
 };
 </script>
 
@@ -57,10 +70,5 @@ const makeMove = (x:number,y:number) => {
 </template>
 
 <style scoped lang="scss">
-.reset-container {
-  margin: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+
 </style>

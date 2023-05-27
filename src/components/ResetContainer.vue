@@ -15,3 +15,12 @@ const newRound = () => {
     <button @click="newGame">New Game (new players)</button>
   </div>
 </template>
+
+<style scoped lang="scss">
+.reset-container {
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+</style>
