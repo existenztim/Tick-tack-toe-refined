@@ -8,6 +8,7 @@ import { checkPlayers } from './services/handleLocalStorage';
 
 const onGoingGame = ref(checkPlayers);
 const players = ref(data.players);
+const turn = ref(Math.random() < 0.5 ? data.players[0].id : data.players[1].id); //random start order between x/o
 localStorage.getItem('players');
 let playerCount = ref(0);
 const incrementplayerCount = () => {
@@ -25,7 +26,9 @@ const hardReset = () => {
 
 const makeMove = (x:number,y:number) => {
   console.log("x:", x, "y:", y)
-  board.value[x][y] = players.value[0].id;
+  console.log(turn.value)
+  board.value[x][y] = turn.value;
+  turn.value = turn.value === data.players[0].id ? data.players[1].id : data.players[0].id;
 };
 </script>
 
@@ -38,7 +41,10 @@ const makeMove = (x:number,y:number) => {
     <h2>Player {{ players[0].name }}'s turn!</h2>
     <div class="game-board">
       <div v-for="(row, x) in board" :key="x">
-        <div @click="makeMove(x,y)" class="cell" v-for="(cell, y) in row" :key="y" :id="`cordinate-${x}-${y}`">{{ cell }}</div>
+        <div @click="makeMove(x,y)" class="cell" v-for="(cell, y) in row" 
+        :key="y" 
+        :id="`cordinate-${x}-${y}`">{{ cell }}
+        </div>
       </div>
     </div>
     <ResetContainer @newGame="hardReset" />
