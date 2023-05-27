@@ -12,7 +12,7 @@ const players = ref(data.players);
 const turn = ref(Math.random() < 0.5 ? data.players[0].id : data.players[1].id); //random start order between x/o
 localStorage.getItem('players');
 let playerCount = ref(0);
-const board = ref([...data.initBoard]);
+const board = ref(JSON.parse(JSON.stringify(data.initBoard)));
 
 const incrementplayerCount = () => {
   playerCount.value++;
@@ -22,11 +22,9 @@ const hardReset = () => {
   localStorage.removeItem('players');
   onGoingGame.value = null;
   playerCount.value = 0;
-  board.value = [
-  ['', '', ''],
-  ['', '', ''],
-  ['', '', '']
-];
+  console.log("value",board.value)
+  console.log("start value",data.initBoard)
+  board.value = data.initBoard;
 };
 
  const softReset = () => {
