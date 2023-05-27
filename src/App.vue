@@ -11,22 +11,32 @@ const players = ref(data.players);
 const turn = ref(Math.random() < 0.5 ? data.players[0].id : data.players[1].id); //random start order between x/o
 localStorage.getItem('players');
 let playerCount = ref(0);
+const board = ref([...data.initBoard]);
+
 const incrementplayerCount = () => {
   playerCount.value++;
 };
-
-const board = ref(data.initBoard);
 
 const hardReset = () => {
   localStorage.removeItem('players');
   onGoingGame.value = null;
   playerCount.value = 0;
-  board.value = data.initBoard;
+  board.value = [
+  ['', '', ''],
+  ['', '', ''],
+  ['', '', '']
+];
 };
 
+ const softReset = () => {
+  console.log("soft reset not implemented yet!");
+ }
+
 const makeMove = (x:number,y:number) => {
-  console.log("x:", x, "y:", y)
-  console.log(turn.value)
+  //check if cell already has a value
+  if (board.value[x][y]) {
+    return;
+  }
   board.value[x][y] = turn.value;
   turn.value = turn.value === data.players[0].id ? data.players[1].id : data.players[0].id;
 };
@@ -38,16 +48,16 @@ const makeMove = (x:number,y:number) => {
     <div v-for="player in players">
       <ScoreTracker :player="player" />
     </div>
-    <h2>Player {{ players[0].name }}'s turn!</h2>
+    <h2>Player {{ turn }}'s turn!</h2>
     <div class="game-board">
       <div v-for="(row, x) in board" :key="x">
         <div @click="makeMove(x,y)" class="cell" v-for="(cell, y) in row" 
         :key="y" 
-        :id="`cordinate-${x}-${y}`">{{ cell }}
+        :id="`cordinate-${x}-${y}-player-${cell}`">{{ cell }}
         </div>
       </div>
     </div>
-    <ResetContainer @newGame="hardReset" />
+    <ResetContainer @newGame="hardReset" @newRound="softReset"/>
   </div>
   <div v-else>
     <AddName :playerCount="playerCount" :players="players" @increment="incrementplayerCount" />
@@ -70,6 +80,13 @@ const makeMove = (x:number,y:number) => {
       background-color: beige;
     }
   }
+  div[id$="X"] {
+  color:#1b85b8
+}
+
+div[id$="O"] {
+  color:#e66c37
+}
 }
 .reset-container {
   margin: 1rem;
