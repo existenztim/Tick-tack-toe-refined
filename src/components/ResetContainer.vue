@@ -5,7 +5,7 @@ const newGame = () => {
 };
 
 const newRound = () => {
-  emits('newGame');
+  emits('newRound');
 };
 </script>
 
