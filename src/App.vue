@@ -12,8 +12,9 @@ const onGoingGame = ref(checkPlayers);
 const players = ref(data.players);
 const turn = ref(Math.random() < 0.5 ? data.players[0].id : data.players[1].id); //random start order between x/o
 let playerCount = ref(0);
-//let filledCount = ref(0);
+let filledCount = ref(0);
 const winMsg = ref();
+const drawMsg = ref("");
 const board = ref(JSON.parse(JSON.stringify(data.initBoard)));
 
 const incrementplayerCount = () => {
@@ -22,16 +23,19 @@ const incrementplayerCount = () => {
 
 const CalculateWinner = (board:string[][]) => {
   const winCombos = data.winCombos;
-for (let i = 0; i < winCombos.length; i++) {
-    const [a, b, c] = winCombos[i]
-    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-		console.log("test",board[a])
-      board[a] = players.value[0].id ? players.value[0].score +=1 : players.value[0].score +=1;
-		return board[a]
+  for (const combo of winCombos) {
+    const [firstCell, secondCell, thirdCell] = combo;
+    if (
+      board[firstCell] &&
+      board[firstCell] === board[secondCell] &&
+      board[firstCell] === board[thirdCell]
+    ) {
+      winMsg.value = board[firstCell];
+      return board[firstCell];
     }
   }
   return null;
-}
+};
 
 const hardReset = () => {
   localStorage.removeItem('players');
@@ -42,7 +46,7 @@ const hardReset = () => {
 
  const softReset = () => {
   console.log("soft reset not implemented yet!");
-  board.value = data.initBoard;
+  board.value = JSON.parse(JSON.stringify(data.initBoard));
   winMsg.value = null;
  }
 
@@ -50,18 +54,30 @@ const hardReset = () => {
   return CalculateWinner(board.value.flat());
 });
 
-const makeMove = (x:number,y:number) => {
+const makeMove = (x: string, y: string) => {
   if (winner.value) {
-    console.log("winner is : ",winner.value)
     return;
   }
 
   if (board.value[x][y]) {
     return;
   }
+  if (filledCount.value > 7) {
+    drawMsg.value = "nobody";
+    return;
+  }
   board.value[x][y] = turn.value;
-  turn.value = turn.value === data.players[0].id ? data.players[1].id : data.players[0].id;
-  //filledCount.value++;
+  let currentWinner = CalculateWinner(board.value.flat())
+  console.log(currentWinner);
+  if (currentWinner) {
+    if (currentWinner == players.value[0].id) {
+      players.value[0].score +=1
+    } else {
+      players.value[1].score +=1
+    }
+  }
+  filledCount.value++; 
+  turn.value = turn.value === players.value[0].id ? players.value[1].id : players.value[0].id;
 };
 </script>
 
@@ -72,6 +88,7 @@ const makeMove = (x:number,y:number) => {
       <ScoreTracker :player="player" />
     </div>
     <h2 v-if="winMsg">Player {{ winMsg }}'s wins!</h2>
+    <h2 v-else-if="drawMsg">There was a draw!</h2>
     <h2 v-else> Player {{ turn }}'s turn!</h2>
     <GameBoard 
     :board="board" 
