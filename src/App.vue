@@ -33,7 +33,7 @@ const incrementplayerCount = () => {
   gameData.value.playerCount++;
 };
 
-const CalculateWinner = (board:string[][]) => {
+const CalculateWinner = (board:string[]) => {
   const winCombos = data.winCombos;
   for (const combo of winCombos) {
     const [firstCell, secondCell, thirdCell] = combo;
@@ -90,7 +90,6 @@ const controlMove = (x: string, y: string) => {
 };
 
 const makeMove = (x: string, y: string) => {
-  updateLocalstorage(gameData.value);
   console.log("gameData",gameData.value);
   gameData.value.board[Number(x)][Number(y)] = gameData.value.turn;
   let currentWinner = CalculateWinner(gameData.value.board.flat())
@@ -100,6 +99,7 @@ const makeMove = (x: string, y: string) => {
 }
   gameData.value.filledCount++; 
   gameData.value.turn = gameData.value.turn === gameData.value.players[0].id ? gameData.value.players[1].id : gameData.value.players[0].id;
+  updateLocalstorage(gameData.value);
 }
 </script>
 
@@ -118,6 +118,11 @@ const makeMove = (x: string, y: string) => {
   </div>
 </template>
 
-<style scoped lang="scss">
-
+<style lang="scss">
+.X {
+  color:#1b85b8
+}
+.O {
+  color:#e66c37
+}
 </style>

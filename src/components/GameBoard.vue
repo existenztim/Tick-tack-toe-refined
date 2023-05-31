@@ -31,6 +31,7 @@ const fillCell = (x:number, y:number) => {
     background-color: aliceblue;
     width: 50px;
     height: 50px;
+    cursor: pointer;
     &:hover {
       background-color: beige;
     }

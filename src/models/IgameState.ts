@@ -6,7 +6,7 @@ export interface IgameState {
     turn: string,
     playerCount: number,
     filledCount: number,
-    winMsg: null | string[],
+    winMsg: null | string,
     drawMsg: string,
     board: string[][]
 }
