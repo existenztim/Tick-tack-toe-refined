@@ -5,7 +5,7 @@ const msg = defineProps(["winMsg","drawMsg", "turn"])
 
 <template>
     <h2 v-if="winMsg">Player {{ winMsg }}'s wins!</h2>
-    <h2 v-else-if="drawMsg">There was a draw!</h2>
+    <h2 v-else-if="drawMsg"> There was a {{drawMsg}}!</h2>
     <h2 v-else :class="turn"> Player {{ turn }}'s turn!</h2>
 </template>
 
