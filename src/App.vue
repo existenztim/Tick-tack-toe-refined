@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import * as data from './models/data';
-import { LocalStorageItem, checkPlayers, updateLocalstorage } from './services/handleLocalStorage';
+import { checkPlayers, checkGameState, updateLocalstorage } from './services/handleLocalStorage';
 import AddName from './components/AddName.vue';
 import ScoreTracker from './components/ScoreTracker.vue';
 import ResetContainer from './components/ResetContainer.vue';
@@ -19,6 +19,16 @@ const gameData = ref<IgameState>({
   drawMsg: "",
   board: JSON.parse(JSON.stringify(data.initBoard))
 });
+
+if(checkGameState) {
+  console.log("Exists in local storage:", checkGameState);
+  const storedGameData: IgameState = JSON.parse(checkGameState);
+  console.log(storedGameData)
+  gameData.value = storedGameData;
+} 
+
+updateLocalstorage(gameData.value);
+
 const incrementplayerCount = () => {
   gameData.value.playerCount++;
 };
@@ -41,6 +51,7 @@ const CalculateWinner = (board:string[][]) => {
 
 const hardReset = () => {
   localStorage.removeItem('players');
+  localStorage.removeItem('gameState');
   gameData.value.onGoingGame = null;
   gameData.value.players.forEach(player => {
     player.score = 0;
@@ -67,11 +78,11 @@ const controlMove = (x: string, y: string) => {
   if (winner.value) {
     return;
   }
-  if (gameData.value.board[x][y]) {
+  if (gameData.value.board[Number(x)][Number(y)]) {
     return;
   }
   if (gameData.value.filledCount >= 8) {
-    gameData.value.board[x][y] = gameData.value.turn;
+    gameData.value.board[Number(x)][Number(y)] = gameData.value.turn;
     gameData.value.drawMsg = "nobody";
     return;
   }
@@ -79,17 +90,14 @@ const controlMove = (x: string, y: string) => {
 };
 
 const makeMove = (x: string, y: string) => {
-  updateLocalstorage(gameData);
-  gameData.value.board[x][y] = gameData.value.turn;
+  updateLocalstorage(gameData.value);
+  console.log("gameData",gameData.value);
+  gameData.value.board[Number(x)][Number(y)] = gameData.value.turn;
   let currentWinner = CalculateWinner(gameData.value.board.flat())
-  console.log(currentWinner);
   if (currentWinner) {
-    if (currentWinner.toString() === gameData.value.players[0].id) {
-      gameData.value.players[0].score +=1
-    } else {
-      gameData.value.players[0].score +=1
-    }
-  }
+  const playerIndex = currentWinner.toString() === gameData.value.players[0].id ? 0 : 1;
+  gameData.value.players[playerIndex].score += 1;
+}
   gameData.value.filledCount++; 
   gameData.value.turn = gameData.value.turn === gameData.value.players[0].id ? gameData.value.players[1].id : gameData.value.players[0].id;
 }
