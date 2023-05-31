@@ -1,24 +1,26 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import * as data from './models/data';
-import { checkPlayers } from './services/handleLocalStorage';
+import { LocalStorageItem, checkPlayers, updateLocalstorage } from './services/handleLocalStorage';
 import AddName from './components/AddName.vue';
 import ScoreTracker from './components/ScoreTracker.vue';
 import ResetContainer from './components/ResetContainer.vue';
 import GameBoard from './components/GameBoard.vue';
+import UserFeedback from './components/UserFeedback.vue';
+import { IgameState } from './models/IgameState';
 
-localStorage.getItem('players');
-const onGoingGame = ref(checkPlayers);
-const players = ref(data.players);
-const turn = ref(Math.random() < 0.5 ? data.players[0].id : data.players[1].id); //random start order between x/o
-let playerCount = ref(0);
-let filledCount = ref(0);
-const winMsg = ref();
-const drawMsg = ref("");
-const board = ref(JSON.parse(JSON.stringify(data.initBoard)));
-
+const gameData = ref<IgameState>({
+  onGoingGame: checkPlayers,
+  players: data.players,
+  turn: Math.random() < 0.5 ? data.players[0].id : data.players[1].id,
+  playerCount: 0,
+  filledCount: 0,
+  winMsg: null,
+  drawMsg: "",
+  board: JSON.parse(JSON.stringify(data.initBoard))
+});
 const incrementplayerCount = () => {
-  playerCount.value++;
+  gameData.value.playerCount++;
 };
 
 const CalculateWinner = (board:string[][]) => {
@@ -30,7 +32,7 @@ const CalculateWinner = (board:string[][]) => {
       board[firstCell] === board[secondCell] &&
       board[firstCell] === board[thirdCell]
     ) {
-      winMsg.value = board[firstCell];
+      gameData.value.winMsg = board[firstCell];
       return board[firstCell];
     }
   }
@@ -39,72 +41,72 @@ const CalculateWinner = (board:string[][]) => {
 
 const hardReset = () => {
   localStorage.removeItem('players');
-  onGoingGame.value = null;
-  playerCount.value = 0;
-  board.value = data.initBoard;
+  gameData.value.onGoingGame = null;
+  gameData.value.players.forEach(player => {
+    player.score = 0;
+  });
+  gameData.value.board = JSON.parse(JSON.stringify(data.initBoard));
+  gameData.value.playerCount = 0;
+  gameData.value.filledCount = 0;
+  gameData.value.drawMsg = "";
+  gameData.value.winMsg = null;
 };
 
  const softReset = () => {
-  console.log("soft reset not implemented yet!");
-  board.value = JSON.parse(JSON.stringify(data.initBoard));
-  winMsg.value = null;
+  gameData.value.board = JSON.parse(JSON.stringify(data.initBoard));
+  gameData.value.winMsg = null;
+  gameData.value.filledCount = 0;
+  gameData.value.drawMsg = "";
  }
 
  const winner = computed(() => {
-  return CalculateWinner(board.value.flat());
+  return CalculateWinner(gameData.value.board.flat());
 });
 
-const makeMove = (x: string, y: string) => {
+const controlMove = (x: string, y: string) => {
   if (winner.value) {
     return;
   }
+  if (gameData.value.board[x][y]) {
+    return;
+  }
+  if (gameData.value.filledCount >= 8) {
+    gameData.value.board[x][y] = gameData.value.turn;
+    gameData.value.drawMsg = "nobody";
+    return;
+  }
+  makeMove(x,y);
+};
 
-  if (board.value[x][y]) {
-    return;
-  }
-  if (filledCount.value > 7) {
-    drawMsg.value = "nobody";
-    return;
-  }
-  board.value[x][y] = turn.value;
-  let currentWinner = CalculateWinner(board.value.flat())
+const makeMove = (x: string, y: string) => {
+  updateLocalstorage(gameData);
+  gameData.value.board[x][y] = gameData.value.turn;
+  let currentWinner = CalculateWinner(gameData.value.board.flat())
   console.log(currentWinner);
   if (currentWinner) {
-    if (currentWinner == players.value[0].id) {
-      players.value[0].score +=1
+    if (currentWinner.toString() === gameData.value.players[0].id) {
+      gameData.value.players[0].score +=1
     } else {
-      players.value[1].score +=1
+      gameData.value.players[0].score +=1
     }
   }
-  filledCount.value++; 
-  turn.value = turn.value === players.value[0].id ? players.value[1].id : players.value[0].id;
-};
+  gameData.value.filledCount++; 
+  gameData.value.turn = gameData.value.turn === gameData.value.players[0].id ? gameData.value.players[1].id : gameData.value.players[0].id;
+}
 </script>
 
 <template>
   <h1>tick tack toe</h1>
-    <div class="game-container" v-if="playerCount >= 2 || onGoingGame">
-    <div v-for="player in players">
+  <div class="game-container" v-if="gameData.playerCount >= 2 || gameData.onGoingGame">
+    <div v-for="player in gameData.players">
       <ScoreTracker :player="player" />
     </div>
-    <h2 v-if="winMsg">Player {{ winMsg }}'s wins!</h2>
-    <h2 v-else-if="drawMsg">There was a draw!</h2>
-    <h2 v-else> Player {{ turn }}'s turn!</h2>
-    <GameBoard 
-    :board="board" 
-    @fillCell="makeMove"
-    />
-    <ResetContainer 
-    @newGame="hardReset" 
-    @newRound="softReset"
-    />
+    <UserFeedback :winMsg="gameData.winMsg" :drawMsg="gameData.drawMsg" :turn="gameData.turn"/>
+    <GameBoard :board="gameData.board" @fillCell="controlMove"/>
+    <ResetContainer @newGame="hardReset" @newRound="softReset"/>
   </div>
   <div v-else>
-    <AddName 
-    :playerCount="playerCount" 
-    :players="players" 
-    @increment="incrementplayerCount" 
-    />
+    <AddName :playerCount="gameData.playerCount" :players="gameData.players" @increment="incrementplayerCount" />
   </div>
 </template>
 
