@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import * as data from './models/data';
-import { checkPlayers, checkGameState, updateLocalstorage } from './services/handleLocalStorage';
+import { checkPlayers, checkGameState, updateLocalstorage, removeLocalstorage } from './services/handleLocalStorage';
 import AddName from './components/AddName.vue';
 import ScoreTracker from './components/ScoreTracker.vue';
 import ResetContainer from './components/ResetContainer.vue';
@@ -21,9 +21,7 @@ const gameData = ref<IgameState>({
 });
 
 if(checkGameState) {
-  console.log("Exists in local storage:", checkGameState);
   const storedGameData: IgameState = JSON.parse(checkGameState);
-  console.log(storedGameData)
   gameData.value = storedGameData;
 } 
 
@@ -50,8 +48,7 @@ const CalculateWinner = (board:string[]) => {
 };
 
 const hardReset = () => {
-  localStorage.removeItem('players');
-  localStorage.removeItem('gameState');
+  removeLocalstorage(['players','gameState']);
   gameData.value.onGoingGame = null;
   gameData.value.players.forEach(player => {
     player.score = 0;
@@ -90,7 +87,6 @@ const controlMove = (x: string, y: string) => {
 };
 
 const makeMove = (x: string, y: string) => {
-  console.log("gameData",gameData.value);
   gameData.value.board[Number(x)][Number(y)] = gameData.value.turn;
   let currentWinner = CalculateWinner(gameData.value.board.flat())
   if (currentWinner) {

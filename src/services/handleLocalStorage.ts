@@ -4,8 +4,10 @@ import { IgameState } from '../models/IgameState';
 export const checkPlayers: string | null = localStorage.getItem('players');
 export const checkGameState: string | null = localStorage.getItem('gameState');
 
-export const removePlayers = () => {
-  localStorage.removeItem('players');
+export const removeLocalstorage = (objects: string[]) => {
+  objects.forEach((object) => {
+    localStorage.removeItem(object);
+  });
 };
 
 export const addUser = (array: Iplayer[], player: Iplayer) => {
