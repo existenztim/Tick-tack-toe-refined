@@ -16,16 +16,16 @@ const gameState = ref<IgameState>({
   playerCount: 0,
   filledCount: 0,
   winMsg: null,
-  drawMsg: "",
-  board: JSON.parse(JSON.stringify(data.initBoard))
+  drawMsg: '',
+  board: JSON.parse(JSON.stringify(data.initBoard)),
 });
 
-if(checkGameState) {
+if (checkGameState) {
   const storedgameState: IgameState = JSON.parse(checkGameState);
   gameState.value = storedgameState;
-} 
+}
 
-watch(gameState.value, (newValue:IgameState) => {
+watch(gameState.value, (newValue: IgameState) => {
   updateLocalstorage(newValue);
 });
 
@@ -33,15 +33,11 @@ const incrementplayerCount = () => {
   gameState.value.playerCount++;
 };
 
-const CalculateWinner = (board:string[]) => {
+const CalculateWinner = (board: string[]) => {
   const winCombos = data.winCombos;
   for (const combo of winCombos) {
     const [firstCell, secondCell, thirdCell] = combo;
-    if (
-      board[firstCell] &&
-      board[firstCell] === board[secondCell] &&
-      board[firstCell] === board[thirdCell]
-    ) {
+    if (board[firstCell] && board[firstCell] === board[secondCell] && board[firstCell] === board[thirdCell]) {
       gameState.value.winMsg = board[firstCell];
       return board[firstCell];
     }
@@ -50,26 +46,26 @@ const CalculateWinner = (board:string[]) => {
 };
 
 const hardReset = () => {
-  removeLocalstorage(['players','gameState']);
+  removeLocalstorage(['players', 'gameState']);
   gameState.value.onGoingGame = null;
-  gameState.value.players.forEach(player => {
+  gameState.value.players.forEach((player) => {
     player.score = 0;
   });
   gameState.value.board = JSON.parse(JSON.stringify(data.initBoard));
   gameState.value.playerCount = 0;
   gameState.value.filledCount = 0;
-  gameState.value.drawMsg = "";
+  gameState.value.drawMsg = '';
   gameState.value.winMsg = null;
 };
 
- const softReset = () => {
+const softReset = () => {
   gameState.value.board = JSON.parse(JSON.stringify(data.initBoard));
   gameState.value.winMsg = null;
   gameState.value.filledCount = 0;
-  gameState.value.drawMsg = "";
- }
+  gameState.value.drawMsg = '';
+};
 
- const winner = computed(() => {
+const winner = computed(() => {
   return CalculateWinner(gameState.value.board.flat());
 });
 
@@ -82,22 +78,25 @@ const controlMove = (x: string, y: string) => {
   }
   if (gameState.value.filledCount >= 8) {
     gameState.value.board[Number(x)][Number(y)] = gameState.value.turn;
-    gameState.value.drawMsg = "draw";
+    gameState.value.drawMsg = 'draw';
     return;
   }
-  makeMove(x,y);
+  makeMove(x, y);
 };
 
 const makeMove = (x: string, y: string) => {
   gameState.value.board[Number(x)][Number(y)] = gameState.value.turn;
-  let currentWinner = CalculateWinner(gameState.value.board.flat())
+  let currentWinner = CalculateWinner(gameState.value.board.flat());
   if (currentWinner) {
-  const playerIndex = currentWinner.toString() === gameState.value.players[0].id ? 0 : 1;
-  gameState.value.players[playerIndex].score += 1;
-}
-  gameState.value.filledCount++; 
-  gameState.value.turn = gameState.value.turn === gameState.value.players[0].id ? gameState.value.players[1].id : gameState.value.players[0].id;
-}
+    const playerIndex = currentWinner.toString() === gameState.value.players[0].id ? 0 : 1;
+    gameState.value.players[playerIndex].score += 1;
+  }
+  gameState.value.filledCount++;
+  gameState.value.turn =
+    gameState.value.turn === gameState.value.players[0].id
+      ? gameState.value.players[1].id
+      : gameState.value.players[0].id;
+};
 </script>
 
 <template>
@@ -106,34 +105,20 @@ const makeMove = (x: string, y: string) => {
     <div v-for="player in gameState.players">
       <ScoreTracker :player="player" />
     </div>
-    <UserFeedback 
-    :winMsg="gameState.winMsg" 
-    :drawMsg="gameState.drawMsg" 
-    :turn="gameState.turn"
-    />
-    <GameBoard 
-    :board="gameState.board" 
-    @fillCell="controlMove"
-    />
-    <ResetContainer 
-    @newGame="hardReset" 
-    @newRound="softReset"
-    />
+    <UserFeedback :winMsg="gameState.winMsg" :drawMsg="gameState.drawMsg" :turn="gameState.turn" />
+    <GameBoard :board="gameState.board" @fillCell="controlMove" />
+    <ResetContainer @newGame="hardReset" @newRound="softReset" />
   </div>
   <div v-else>
-    <AddName 
-    :playerCount="gameState.playerCount" 
-    :players="gameState.players" 
-    @increment="incrementplayerCount" 
-    />
+    <AddName :playerCount="gameState.playerCount" :players="gameState.players" @increment="incrementplayerCount" />
   </div>
 </template>
 
 <style lang="scss">
 .X {
-  color:#1b85b8
+  color: #1b85b8;
 }
 .O {
-  color:#e66c37
+  color: #e66c37;
 }
 </style>
