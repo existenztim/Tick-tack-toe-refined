@@ -76,7 +76,7 @@ const controlMove = (x: string, y: string) => {
   if (gameState.value.board[Number(x)][Number(y)]) {
     return;
   }
-  if (gameState.value.filledCount >= 8) {
+  if (gameState.value.filledCount >= 9) {
     gameState.value.board[Number(x)][Number(y)] = gameState.value.turn;
     gameState.value.drawMsg = 'draw';
     return;
@@ -87,15 +87,16 @@ const controlMove = (x: string, y: string) => {
 const makeMove = (x: string, y: string) => {
   gameState.value.board[Number(x)][Number(y)] = gameState.value.turn;
   let currentWinner = CalculateWinner(gameState.value.board.flat());
-  if (currentWinner) {
-    const playerIndex = currentWinner.toString() === gameState.value.players[0].id ? 0 : 1;
-    gameState.value.players[playerIndex].score += 1;
-  }
-  gameState.value.filledCount++;
   gameState.value.turn =
     gameState.value.turn === gameState.value.players[0].id
       ? gameState.value.players[1].id
       : gameState.value.players[0].id;
+  gameState.value.filledCount++;
+
+  if (currentWinner) {
+    const playerIndex = currentWinner.toString() === gameState.value.players[0].id ? 0 : 1;
+    gameState.value.players[playerIndex].score += 1;
+  }
 };
 </script>
 
