@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Iplayer } from '../models/Iplayer';
-import { addUser, checkPlayers } from '../services/handleLocalStorage';
+import { addUser } from '../services/handleLocalStorage';
 const emits = defineEmits(['increment']);
-const { players, nameCount } = defineProps(['players', 'nameCount']);
+const { players, playerCount } = defineProps(['players', 'playerCount']);
 const newName = ref('');
 
 const addName = (playerToUpdate: Iplayer) => {
@@ -16,10 +16,10 @@ const addName = (playerToUpdate: Iplayer) => {
 </script>
 
 <template>
-  <div v-if="nameCount < 2 && checkPlayers == null">
-    <!--lägg in localstorage check här med senare-->
-    <input v-model="newName" type="text" :placeholder="`Name for player ${players[nameCount].id}`" />
-    <button @click="addName(players[nameCount])">Add name</button>
+  <div>
+    <p>Let's start a new game!</p>
+    <input v-model="newName" type="text" :placeholder="`Name for player ${players[playerCount].id}`" />
+    <button @click="addName(players[playerCount])">Add name</button>
   </div>
 </template>
 <style scoped></style>
