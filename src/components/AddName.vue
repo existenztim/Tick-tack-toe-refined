@@ -22,4 +22,8 @@ const addName = (playerToUpdate: Iplayer) => {
     <button @click="addName(players[playerCount])">Add name</button>
   </div>
 </template>
-<style scoped></style>
+<style scoped>
+input {
+  margin: 1rem;
+}
+</style>

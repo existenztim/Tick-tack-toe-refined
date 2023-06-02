@@ -76,12 +76,12 @@ const controlMove = (x: string, y: string) => {
   if (gameState.value.board[Number(x)][Number(y)]) {
     return;
   }
-  if (gameState.value.filledCount >= 9) {
-    gameState.value.board[Number(x)][Number(y)] = gameState.value.turn;
-    gameState.value.drawMsg = 'draw';
-    return;
-  }
+
   makeMove(x, y);
+
+  if (gameState.value.filledCount >= 9 && !winner.value) {
+    gameState.value.drawMsg = 'draw';
+  }
 };
 
 const makeMove = (x: string, y: string) => {
@@ -101,7 +101,7 @@ const makeMove = (x: string, y: string) => {
 </script>
 
 <template>
-  <h1>tick tack toe</h1>
+  <h1>Tick-tack-toe</h1>
   <div class="game-container" v-if="gameState.playerCount >= 2 || gameState.onGoingGame">
     <div v-for="player in gameState.players">
       <ScoreTracker :player="player" />
@@ -118,8 +118,10 @@ const makeMove = (x: string, y: string) => {
 <style lang="scss">
 .X {
   color: #1b85b8;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 .O {
   color: #e66c37;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 </style>
